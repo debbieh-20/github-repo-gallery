@@ -3,6 +3,10 @@ const overview = document.querySelector (".overview");
 const username = "debbieh-20";
 //to select the unordered lit to display the repos list
 const repoList = document.querySelector (".repo-list");
+//selects the section with class of repos
+const allReposContainer = document.querySelector(".repos");
+//selects the section with a class of repo-data where the individual repo data will appear
+const repoData = document.querySelector(".repo-data");
 
 //fetch api json data
 const gitUserInfo = async function () {
@@ -43,7 +47,7 @@ const gitRepos = async function () {
   const fetchRepos = await 
     fetch(`https://api.github.com/users/${username}/repos?sort=updated&per_page=100`);
       const repoData = await fetchRepos.json();
-      displayRepos(repoData);
+      displayRepos(repoData); 
 };
 //display info about your repos
 const displayRepos = function (repos) {
@@ -54,3 +58,48 @@ const displayRepos = function (repos) {
     repoList.append(repoItem);
   }
 };
+
+//add a click event on the unordered list
+repoList.addEventListener("click", function(e) {
+  if (e.target.matches("h3")) {
+    const repoName = e.target.innerText;
+    getRepoInfo(repoName);
+  }
+});
+
+//create a function to get specific repo info
+const getRepoInfo = async function (repoName) {
+  const fetchInfo = await
+    fetch(`https://api.github.com/repos/${username}/${repoName}`);
+    const repoInfo = await fetchInfo.json();
+    console.log(repoInfo);
+
+//get languages and create an array of languages
+    const fetchLanguages = await fetch(repoInfo.language_url);
+    const languageData = await fetchLanguages.json();
+    
+    const languages = [];
+      for (const language in languageData) {
+      languages.push(language);
+    }
+    displayRepoInfo(repoInfo, languages);
+};
+
+//create a function to display specific repo info
+const displayRepoInfo = function (repoInfo, languages) {
+  repoData.innerHTML = "";
+  repoData.classList.remove("hide");
+  allReposContainer.classList.add("hide");
+  const div = document.createElement("div");
+  div.innerHTML = `
+    <h3>Name: ${repoInfo.name}</h3>
+    <p>Description: ${repoInfo.description}</p>
+    <p>Default Branch: ${repoInfo.default_branch}</p>
+    <p>Languages: ${languages.join(",")}</p>
+    <a class="visit" href="${repoInfo.html_url}" target="_blank" rel="noreferrernoopener">View Repo on GitHub!</a>
+    `;
+    repoData.append(div);
+  };
+
+
+
