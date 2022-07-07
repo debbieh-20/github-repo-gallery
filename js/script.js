@@ -80,7 +80,7 @@ const getRepoInfo = async function (repoName) {
     console.log(repoInfo);
 
 //get languages and create an array of languages
-    const fetchLanguages = await fetch(repoInfo.language_url);
+    const fetchLanguages = await fetch(repoInfo.languages_url);
     const languageData = await fetchLanguages.json();
     
     const languages = [];
